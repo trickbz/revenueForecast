@@ -1,0 +1,105 @@
+﻿.aggregateColumn {
+    background-color: #F4F4F4;
+    font-weight: bold;
+}
+
+.group-row {
+    border-bottom: 1px solid #68AD45;
+    overflow: hidden;
+    width: 100%;
+    padding: 15px 10px;
+}
+
+.group-row-header {
+    overflow: hidden;
+    width: 100%;
+    padding: 0 10px;
+}
+
+.group-panel {
+    width: 200px;
+    float: left;
+    height: 100%;
+}
+
+.group-table-container-header {
+    overflow: hidden;
+}
+
+.group-table-container {
+    overflow: hidden;
+}
+
+    .group-table-container > table,
+    .group-table-container-header > table {
+        border-collapse: collapse;
+        width: 100%;
+        table-layout: fixed;
+        position: relative;
+    }
+
+    
+
+    .group-table-container table tr {
+        border-bottom: 1px solid #d8d6d6;
+        border-top: 1px solid #d8d6d6;
+    }
+
+    .group-table-container table td,
+    .group-table-container-header table td {
+        padding: 5px 5px;
+        text-align: right;
+    }
+
+        .group-table-container table td.name-column,
+        .group-table-container-header table td.name-column {
+            width: 150px;
+            text-align: left;
+            color: #9B9B9B;
+        }
+
+.totalsDiv {
+    background-color: #F7FBF5;
+    -ms-border-radius: 5px;
+    border-radius: 5px;
+    border: 2px solid #8AC007;
+}
+
+.revenueForecastTableDiv {
+    font-family: Arial;
+}
+
+img.toggleImage {
+    cursor: pointer;
+}
+
+.buttons-panel {
+    margin: 10px;
+}
+
+.node-title {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.childrenCountLabel {
+    color: #999999;
+    font-size: 11pt;
+}
+
+#checkboxes {
+    margin: 10px;
+}
+
+.excludedFromTotalsWarning {
+    background-color: #FEF2DF;
+    color: #F8A923;
+    -ms-border-radius: 7px;
+    border-radius: 7px;
+    padding: 5px;
+    font-size: 13px;
+    font-weight: bold;
+    margin: 0 15px 0 0;
+    height: 50px;
+    width: 150px;
+}

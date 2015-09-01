@@ -1,0 +1,80 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutNew.cshtml";
+}
+
+@section Scripts
+{
+    <link href="~/Scripts/Views/RevenueForecast/styles/revenueForecast.css" rel="stylesheet" />
+
+    <script src="~/Scripts/newui/knockout/knockout-3.3.0.js"></script>
+    <script src="~/Scripts/newui/jquery/jquery-1.11.3.min.js"></script>
+    <script src="~/Scripts/newui/underscore/underscore-min.js"></script>
+    <script src="~/Scripts/newui/moment/moment.js"></script>
+    <script src="~/Scripts/Views/RevenueForecast/model/revenueForecastMetric.js"></script>
+    <script src="~/Scripts/Views/RevenueForecast/revenueForecastHelper.js"></script>
+    <script src="~/Scripts/Views/RevenueForecast/model/revenueForecastComputedMetric.js"></script>
+    <script src="~/Scripts/Views/RevenueForecast/model/revenueForecastNode.js"></script>
+    <script src="~/Scripts/Views/RevenueForecast/vm/revenueForecastVm.js"></script>
+    <script src="~/Scripts/Views/RevenueForecast/bindingHandlers.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var helper = new RevenueForecastHelper();
+            $.get('@Url.Action("GetReport", "RevenueForecast")', function (json) {
+                var treeData = helper.treeFromFlat(json);
+                ko.applyBindings(new RevenueForecastVm(treeData, helper.metrics()));
+            });
+        });
+    </script>
+}
+
+<div class="revenueForecastTableDiv">
+    <div class="group-row-header">
+        <div class="group-panel">
+            &nbsp;
+        </div>
+        <div class="group-table-container-header">
+            <table>
+                <tr>
+                    <td class="name-column">&nbsp;</td>
+                    <!-- ko foreach: $root.tableHeaderMonthQuarterArray -->
+                    <td data-bind="text: $data, css: { aggregateColumn: ($index() + 1) % 4 === 0 }"></td>
+                    <!-- /ko -->
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="revenueForecastTableDiv" data-bind="template: { name: 'revenueForecastTableTemplate', foreach: tree }"></div>
+
+<script type="text/html" id="revenueForecastTableTemplate">
+    <div class="group-row" data-bind="css: { totalsDiv: isRoot() }">
+        <div class="group-panel">
+            <div data-bind="style: { marginLeft: groupCaptionIndention() }">
+                <span data-bind="css: toggleImage, click: toggleOpen, visible: !isLeaf()" aria-hidden="true"></span>
+                <span class="node-title" data-bind="text: name, click: toggleOpen"></span>
+                <div class="childrenCountLabel"><span data-bind="text: $root.groupItemsCount(level(), children().length)"></span></div>
+                <div data-bind="visible: !includedInTotals()" class="excludedFromTotalsWarning" >
+                    <div style="float: left; height: 100%; padding: 7px 7px;"><img src='@Url.Content("~/Scripts/Views/RevenueForecast/images/alert-triangle-yellow-16.png")' alt="Exclude from totals icon" /></div>
+                    <div><span>This group is not included in totals</span></div>
+                </div>
+                <div data-bind="visible: level() != 0, click: toggleIncludedInTotals"><a href="#" data-bind="text: includedInTotalsText()"></a></div>
+            </div>
+        </div>
+        <div class="group-table-container">
+            <table data-bind="foreach: table, style: { backgroundColor: isRoot() ? 'transparent' : '#F8F8F8', color: includedInTotals() ? 'black' : 'lightgrey' }">
+                <tr data-bind="visible: isVisible">
+                    <td data-bind="text: caption" class="name-column"></td>
+                    <!-- ko foreach: values -->
+                    <td data-bind="text: $data"></td>
+                    <!-- ko if: ($index() + 1) % 3 == 0 -->
+                    <td class="aggregateColumn" data-bind="text: $root.sumQuarter($parent.values, $index())"></td>
+                    <!-- /ko -->
+                    <!-- /ko -->
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div data-bind="template: { name: 'revenueForecastTableTemplate', foreach: children() }, slideToggle: isExpanded"></div>
+</script>
