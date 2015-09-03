@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link href="styles/bootstrap.min.css" rel="stylesheet" />
+    <link href="styles/bootstrap-theme.min.css" rel="stylesheet" />
+    <link href="styles/revenueForecast.css" rel="stylesheet" />
+    
+    <script src="js/vendor/knockout-3.3.0.js"></script>
+    <script src="js/vendor/jquery-1.11.3.min.js"></script>
+    <script src="js/vendor/underscore-min.js"></script>
+    <script src="js/vendor/moment.js"></script>
+    <script src="js/revenueForecastCtrl.js"></script>
+    <script src="js/model/revenueForecastMetric.js"></script>
+    <script src="js/revenueForecastHelper.js"></script>
+    <script src="js/model/revenueForecastComputedMetric.js"></script>
+    <script src="js/model/revenueForecastNode.js"></script>
+    <script src="js/vm/revenueForecastVm.js"></script>
+    
+    <style>
+        td {
+            padding: 10px 20px;
+        }
+        
+        .edit {
+            display: none;
+        }
+        
+        .editing .edit {
+            display: block;
+        }
+        
+        .editing .view {
+            display: none;
+        }
+        
+    </style>
+</head>
+
+<body>
+    
+<div><a href="index.html">Back to index.html</a></div>    
+
+<table data-bind="foreach: items" border="1">
+    <tr>
+        <td data-bind="text: name"></td>
+        <!-- ko foreach: values -->
+        <td data-bind="liveEditor: value">
+            <div class="view" data-bind="text: value, click: value.startEdit"></div>
+            <input class="edit" data-bind="value: value, numeric: value, event: { blur: value.stopEdit }, hasFocus: value.editing"></input>
+        </td>
+        <!-- ko if: $index() === $parent.values().length - 1 -->
+        <td data-bind="text: $parent.sum()"></td>
+        <!-- /ko -->
+        <!-- /ko -->
+    </tr>
+</table>
+
+<script>
+    
+    ko.extenders.liveEditor = function (target) {
+        target.editing = ko.observable(false);
+        
+        target.startEdit = function () {
+            target.editing(true);
+        };
+        
+        target.stopEdit = function () {
+            target.editing(false);
+        };
+        
+        return target;
+    };
+    
+    ko.bindingHandlers.numeric = {
+        init: function (element, valueAccessor) {
+            $(element).on("keydown", function (event) {
+                // Allow: backspace, delete, tab, escape, and enter
+                if (event.keyCode == 46 || event.keyCode == 8 || event.keyCode == 9 || event.keyCode == 27 || event.keyCode == 13 ||
+                    // Allow: Ctrl+A
+                    (event.keyCode == 65 && event.ctrlKey === true) ||
+                    // Allow: . ,
+                    (event.keyCode == 188 || event.keyCode == 190 || event.keyCode == 110) ||
+                    // Allow: home, end, left, right
+                    (event.keyCode >= 35 && event.keyCode <= 39)) {
+                    // let it happen, don't do anything
+                    return;
+                }
+                else {
+                    // Ensure that it is a number and stop the keypress
+                    if (event.shiftKey || (event.keyCode < 48 || event.keyCode > 57) && (event.keyCode < 96 || event.keyCode > 105)) {
+                        event.preventDefault();
+                    }
+                }
+            });
+        }
+    };
+    
+    ko.bindingHandlers.liveEditor = {
+        init: function (element, valueAccessor) {
+            var observable = valueAccessor();
+            observable.extend({ liveEditor: this });
+        },
+        update: function (element, valueAccessor) {
+            var observable = valueAccessor();
+            ko.bindingHandlers.css.update(element, function () {
+                return { editing: observable.editing };
+            });
+        }
+    };
+    
+    function Value(value) {
+        var self = this;
+        self.value = ko.observable(value);
+    }
+    
+    function Item (name, values) {
+        var self = this;
+        self.name = name;
+        self.values = ko.observableArray(values);
+        self.sum = ko.pureComputed(function () {
+           var sum = 0;
+           _.each(self.values(), function (item) {
+              sum += parseFloat(item.value());
+           });
+           return sum;
+        });
+        self.incrementValue = function (item) {
+            item.value(item.value() + 1);
+        };
+    }
+    
+    function ViewModel() {
+        var self = this;
+        self.items = [
+          new Item('name 1', [
+              new Value(1),
+              new Value(2),
+              new Value(3),
+              new Value(4)
+          ]),  
+          new Item('name 2', [
+              new Value(1),
+              new Value(2),
+              new Value(3),
+              new Value(4)
+          ])
+        ];
+    }
+    
+    ko.applyBindings(new ViewModel());
+    
+</script>
+
+</body>
+
+</html>
